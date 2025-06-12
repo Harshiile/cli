@@ -7,6 +7,7 @@ import { CLIError } from '../utils/error';
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk'
 import { jwtGenerate } from '../utils/jwt';
 
 
@@ -15,17 +16,23 @@ interface User {
     email?: string,
     password: string
 }
-export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
-    const { username, password } = req.body
-    if (!username || !password) throw new CLIError(404, "Invalid Params");
 
+const getUser = async (username: string) => {
     const [user] = await db
         .select({ password: userTable.password })
         .from(userTable)
         .where(eq(userTable.username, username))
         .catch(_ => { throw new CLIError(500, "Failed, Try Again") });
+    return user;
+}
 
-    if (!user) throw new CLIError(404, "User not exists");
+export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
+    const { username, password } = req.body
+    if (!username || !password) throw new CLIError(404, "Invalid Params");
+
+    const user = await getUser(username);
+
+    if (!user) throw new CLIError(404, `User not exists, You can sign up at ${chalk.blue('http://localhost:3000/signup')}`);
 
     if (await comparePass(user.password, password)) {
         // Make .config 
@@ -44,6 +51,9 @@ export const addUser = async (req: Request<{}, {}, User>, res: Response) => {
     const { username, email, password } = req.body
 
     if (!username || !email || !password) throw new CLIError(404, "Invalid Params");
+
+    const user = await getUser(username);
+    if (user) throw new CLIError(400, "User Already Exists");
 
     await db
         .insert(userTable)

@@ -1,4 +1,3 @@
-import { CLIError } from "../../controllers/utils/error";
 import { getToken } from "./token";
 
 interface Fetcher {
@@ -38,7 +37,7 @@ export const Fetcher = async ({
     return await fetch(`http://localhost:3000${url}`, fetchOptions)
         .then(res => res.json())
         .then(cb)
-        .catch((err: CLIError) => {
+        .catch((err) => {
             console.log(err)
         })
 }

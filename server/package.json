@@ -11,9 +11,6 @@
     "type": "git",
     "url": "git+https://github.com/Harshiile/cli.git"
   },
-  "bin": {
-    "cli": "./dist/cli/index.js"
-  },
   "author": "harshiile",
   "license": "ISC",
   "bugs": {
@@ -25,6 +22,7 @@
     "archiver": "^7.0.1",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",
+    "chalk": "^5.4.1",
     "commander": "^14.0.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.44.2",

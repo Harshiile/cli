@@ -1,6 +1,4 @@
-import { CLIError } from "../../controllers/utils/error";
 import { Fetcher } from "../utils/fetcher";
-import { getToken } from "../utils/token";
 import { Command } from "commander";
 
 interface WS {

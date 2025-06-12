@@ -1,13 +1,10 @@
-import fs, { mkdirSync } from 'fs'
+import fs from 'fs'
 import path from 'path'
 import archiver from 'archiver'
 import { Command } from 'commander';
 import FormData from 'form-data'
 import axios from 'axios'
-import { CLIError } from '../../controllers/utils/error';
 import { getToken } from '../utils/token';
-import { jwtValidate } from '../../controllers/utils/jwt';
-import { JwtPayload } from 'jsonwebtoken';
 import { Fetcher } from '../utils/fetcher';
 
 
@@ -47,8 +44,8 @@ export const pushCode = (program: Command) => {
             axios.post('http://localhost:3000/push-code', form, {
                 headers
             })
-                .then(({ data }) => console.log(data))
-                .catch(err => { throw new CLIError(500, err.message) })
+                .then(({ data }) => console.log(data.message))
+                .catch(err => console.log(err.message))
 
         });
 }
