@@ -1,4 +1,4 @@
-import fs from 'fs'
+import fs, { mkdirSync } from 'fs'
 import path from 'path'
 import archiver from 'archiver'
 import { Command } from 'commander';
@@ -6,6 +6,9 @@ import FormData from 'form-data'
 import axios from 'axios'
 import { CLIError } from '../../controllers/utils/error';
 import { getToken } from '../utils/token';
+import { jwtValidate } from '../../controllers/utils/jwt';
+import { JwtPayload } from 'jsonwebtoken';
+import { Fetcher } from '../utils/fetcher';
 
 
 export const pushCode = (program: Command) => {
@@ -17,8 +20,16 @@ export const pushCode = (program: Command) => {
 
             const token = getToken();
             if (!token) console.log("Token not found, Please Login Again");
+            let username;
+            await Fetcher({
+                url: '/get-username',
+                cb: (data) => username = data.username,
+                needToken: true
+            })
 
-            const absPath = path.resolve(`./cli-${Date.now()}.zip`);
+            fs.mkdirSync('./.cli', { recursive: true });
+
+            const absPath = path.resolve(`./.cli/cli-${username}-${name}.zip`);
 
             // zip the folder
             await zipFolder(folder_path as string, absPath).catch(err => console.log(err.message));
@@ -36,7 +47,7 @@ export const pushCode = (program: Command) => {
             axios.post('http://localhost:3000/push-code', form, {
                 headers
             })
-                .then(res => console.log(res))
+                .then(({ data }) => console.log(data))
                 .catch(err => { throw new CLIError(500, err.message) })
 
         });

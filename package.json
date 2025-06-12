@@ -30,17 +30,22 @@
     "drizzle-orm": "^0.44.2",
     "express": "^5.1.0",
     "form-data": "^4.0.3",
+    "fs-extra": "^11.3.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
-    "pg": "^8.16.0"
+    "node-fetch": "^3.3.2",
+    "pg": "^8.16.0",
+    "unzipper": "^0.12.3"
   },
   "devDependencies": {
     "@types/archiver": "^6.0.3",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.3",
+    "@types/fs-extra": "^11.0.4",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^1.4.13",
     "@types/pg": "^8.15.4",
+    "@types/unzipper": "^0.10.11",
     "drizzle-kit": "^0.31.1",
     "tsx": "^4.20.1"
   }
