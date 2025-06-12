@@ -4,20 +4,20 @@ import { userTable } from '../../db/schema';
 import { comparePass, encryptPass } from './utils/hashing';
 import { eq } from 'drizzle-orm';
 import { CLIError } from '../utils/error';
+import os from 'os';
+import fs from 'fs';
+import path from 'path';
+import { jwtGenerate } from '../utils/jwt';
+
 
 interface User {
     username: string,
     email?: string,
     password: string
 }
-export const getUser = async (req: Request<{}, {}, User>, res: Response) => {
+export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
     const { username, password } = req.body
-    console.log({
-        username,
-        password
-    });
-
-    if (!username || !password) res.status(404).send("Invalid Params");
+    if (!username || !password) throw new CLIError(404, "Invalid Params");
 
     const [user] = await db
         .select({ password: userTable.password })
@@ -27,14 +27,23 @@ export const getUser = async (req: Request<{}, {}, User>, res: Response) => {
 
     if (!user) throw new CLIError(404, "User not exists");
 
-    if (await comparePass(user.password, password)) res.send("User Logged In")
+    if (await comparePass(user.password, password)) {
+        // Make .config 
+        const CONFIG_PATH = path.join(os.homedir(), '.cli', 'config.json');
+        const token = jwtGenerate({ username })
+
+        fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+        fs.writeFileSync(CONFIG_PATH, JSON.stringify({ token }));
+
+        res.json({ message: "User Logged In" })
+    }
     else throw new CLIError(403, "Incorrect Password");
 }
 
 export const addUser = async (req: Request<{}, {}, User>, res: Response) => {
     const { username, email, password } = req.body
 
-    if (!username || !email || !password) throw new Error("Invalid Params");
+    if (!username || !email || !password) throw new CLIError(404, "Invalid Params");
 
     await db
         .insert(userTable)
@@ -45,5 +54,5 @@ export const addUser = async (req: Request<{}, {}, User>, res: Response) => {
         })
         .catch(_ => { throw new CLIError(500, "Failed, Try Again") });
 
-    res.send("User Created")
+    res.json({ message: "User Created" })
 }

@@ -3,6 +3,13 @@ import { router } from './routes/route'
 import dotenv from 'dotenv'
 import { errorHandler } from './errorHandler';
 
+
+declare module 'express' {
+    interface Request {
+        username?: string;
+    }
+}
+
 const app = express();
 dotenv.config();
 app.use(express.json())

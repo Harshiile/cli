@@ -1,2 +1,13 @@
 ###
-GET http://localhost:3000/get-visibility?name=oauthhtsd
+GET http://localhost:3000/get-visibility?name=oauth
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhcnNoaWlsZSIsImlhdCI6MTc0OTY5ODk0N30.HgANTS7mp4k6dIC-UYGUfiugJrIAfCZD2fvo5-wbHwM
+
+
+### 
+POST http://localhost:3000/login-user
+Content-Type: application/json
+
+{
+    "username":"harshiile",
+    "password":"12"
+}

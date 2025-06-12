@@ -1,17 +1,18 @@
 import { Router, Request, Response } from 'express'
-import { addUser, getUser } from '../controllers/user';
+import { addUser, loginUser } from '../controllers/user';
 import { changeVisibility, deleteWorkspace, getVisibility, getWorkspaces } from '../controllers/workspace';
+import { middleware } from '../middleware';
 
 export const router = Router();
 
 
 router.post('/add-user', addUser)
-router.post('/get-user', getUser)
+router.post('/login-user', loginUser)
 
-router.get('/get-workspaces', getWorkspaces)
-router.delete('/delete-workspace', deleteWorkspace)
+router.get('/get-workspaces', middleware, getWorkspaces)
+router.delete('/delete-workspace', middleware, deleteWorkspace)
 
-router.get('/get-visibility', getVisibility)
-router.patch('/change-visibility', changeVisibility)
+router.get('/get-visibility', middleware, getVisibility)
+router.patch('/change-visibility', middleware, changeVisibility)
 
 
