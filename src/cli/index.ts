@@ -6,6 +6,7 @@ import { getWorkspaceCommand } from './commands/get-workspace';
 import { getVisibiliyOfWorkspaceCommand } from './commands/get-visibility';
 import { changeVisibiliyOfWorkspaceCommand } from './commands/change-visibility';
 import { deleteWorkspaceommand } from './commands/delete-workspace';
+import { pushCode } from './commands/push-code';
 
 const program = new Command();
 
@@ -18,5 +19,6 @@ getWorkspaceCommand(program)
 getVisibiliyOfWorkspaceCommand(program)
 changeVisibiliyOfWorkspaceCommand(program)
 deleteWorkspaceommand(program)
+pushCode(program)
 
 program.parse(process.argv);
