@@ -1,14 +1,13 @@
-import fs from 'fs'
-import path from 'path'
-import archiver from 'archiver'
-import { Command } from 'commander';
-import FormData from 'form-data'
-import axios from 'axios'
-import { getToken } from '../utils/token';
-import { Fetcher } from '../utils/fetcher';
+const fs = require('fs');
+const path = require('path');
+const archiver = require('archiver');
+const FormData = require('form-data');
+const axios = require('axios');
+const { getToken } = require('../utils/token');
+const { Fetcher } = require('../utils/fetcher');
 
 
-export const pushCode = (program: Command) => {
+const pushCode = (program) => {
     program
         .command('push')
         .argument('name')
@@ -29,7 +28,7 @@ export const pushCode = (program: Command) => {
             const absPath = path.resolve(`./.cli/cli-${username}-${name}.zip`);
 
             // zip the folder
-            await zipFolder(folder_path as string, absPath).catch(err => console.log(err.message));
+            await zipFolder(folder_path, absPath).catch(err => console.log(err.message));
 
             // uploading
             const form = new FormData();
@@ -49,15 +48,15 @@ export const pushCode = (program: Command) => {
 
         });
 }
+module.exports = { pushCode }
 
 
-
-export const zipFolder = (folderPath: string, zipPath: string) => {
+const zipFolder = (folderPath, zipPath) => {
     return new Promise((resolve, reject) => {
         const writeStream = fs.createWriteStream(zipPath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
-        writeStream.on('close', (): any => resolve({}))
+        writeStream.on('close', () => resolve({}))
         archive.on('error', err => reject({ err }))
 
         archive.pipe(writeStream)

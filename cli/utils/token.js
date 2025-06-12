@@ -1,8 +1,8 @@
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
-export const getToken = (): string => {
+const getToken = () => {
     const CONFIG_PATH = path.join(os.homedir(), '.cli', 'config.json');
 
     if (!fs.existsSync(CONFIG_PATH)) throw new Error("Config file does not exist, Please Login Again")
@@ -15,3 +15,4 @@ export const getToken = (): string => {
         return token
     }
 }
+module.exports = { getToken }

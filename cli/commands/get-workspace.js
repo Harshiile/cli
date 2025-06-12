@@ -1,11 +1,6 @@
-import { Fetcher } from "../utils/fetcher";
-import { Command } from "commander";
+const { Fetcher } = require('../utils/fetcher');
 
-interface WS {
-    name: string,
-    visibility: boolean
-}
-export const getWorkspaceCommand = (program: Command) => {
+const getWorkspaceCommand = (program) => {
     program
         .command('workspaces ls')
         .option('--public')
@@ -22,8 +17,8 @@ export const getWorkspaceCommand = (program: Command) => {
 
             await Fetcher({
                 url,
-                cb: (workspaces: Array<WS>) => {
-                    workspaces?.forEach((ws: WS) => {
+                cb: (workspaces) => {
+                    workspaces?.forEach((ws) => {
                         if (option.public || option.private) console.log(ws.name)
                         else
                             console.log(`${ws.name} - ${ws.visibility ? 'public' : 'private'}`)
@@ -33,3 +28,4 @@ export const getWorkspaceCommand = (program: Command) => {
             })
         });
 }
+module.exports = { getWorkspaceCommand }

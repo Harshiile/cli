@@ -1,7 +1,6 @@
-import { Command } from "commander";
-import { Fetcher } from "../utils/fetcher";
+const { Fetcher } = require('../utils/fetcher');
 
-export const getVisibiliyOfWorkspaceCommand = (program: Command) => {
+const getVisibiliyOfWorkspaceCommand = (program) => {
     program
         .command('visibility')
         .argument('workspace')
@@ -13,3 +12,4 @@ export const getVisibiliyOfWorkspaceCommand = (program: Command) => {
             })
         });
 }
+module.exports = { getVisibiliyOfWorkspaceCommand }

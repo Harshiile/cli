@@ -1,7 +1,6 @@
-import { Command } from "commander";
-import { Fetcher } from "../utils/fetcher";
+const { Fetcher } = require('../utils/fetcher');
 
-export const deleteWorkspaceommand = (program: Command) => {
+const deleteWorkspaceommand = (program) => {
     program
         .command('delete')
         .argument('workspace')
@@ -14,3 +13,4 @@ export const deleteWorkspaceommand = (program: Command) => {
             })
         });
 }
+module.exports = { deleteWorkspaceommand }

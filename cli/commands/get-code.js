@@ -1,13 +1,12 @@
-import fs from 'fs-extra'
-import path from 'path'
-import { Command } from 'commander';
-import fetch from 'node-fetch'
-import { getToken } from '../utils/token';
-import unzipper from 'unzipper';
-import { Fetcher } from '../utils/fetcher';
+const fs = require('fs-extra');
+const path = require('path');
+const fetch = require('node-fetch');
+const { getToken } = require('../utils/token');
+const unzipper = require('unzipper');
+const { Fetcher } = require('../utils/fetcher');
 
 
-export const getCode = (program: Command) => {
+const getCode = (program) => {
     program
         .command('get')
         .argument('name')
@@ -89,3 +88,4 @@ export const getCode = (program: Command) => {
             else console.log('Username not found')
         });
 }
+module.exports = { getCode }

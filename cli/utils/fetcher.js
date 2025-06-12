@@ -1,19 +1,12 @@
-import { getToken } from "./token";
+const { getToken } = require('./token');
 
-interface Fetcher {
-    url: string,
-    cb: (x: any) => any,
-    body?: object,
-    methodType?: 'GET' | 'POST' | 'PATCH' | 'DELETE',
-    needToken: boolean
-}
-export const Fetcher = async ({
+const Fetcher = async ({
     url,
     cb,
     body,
     methodType = 'GET',
     needToken
-}: Fetcher) => {
+}) => {
     let token;
     if (needToken) {
         token = getToken();
@@ -41,3 +34,4 @@ export const Fetcher = async ({
             console.log(err)
         })
 }
+module.exports = { Fetcher }

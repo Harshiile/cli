@@ -1,7 +1,6 @@
-import { Command } from "commander";
-
-export const testCommand = (program: Command) => {
+const testCommand = (program) => {
     program
         .command('test')
         .action(_ => console.log('TESTING.....'))
 }
+module.exports = { testCommand }

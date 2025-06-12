@@ -1,7 +1,6 @@
-import { Command } from "commander";
-import { Fetcher } from "../utils/fetcher";
+const { Fetcher } = require('../utils/fetcher');
 
-export const loginCommand = (program: Command) => {
+const loginCommand = (program) => {
     program
         .command('login')
         .arguments('<username>')
@@ -20,3 +19,4 @@ export const loginCommand = (program: Command) => {
             })
         })
 }
+module.exports = { loginCommand }
