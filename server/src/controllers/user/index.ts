@@ -41,10 +41,15 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
         const token = jwtGenerate({ username })
 
 
-        if (!fs.existsSync(JOU_FOLDER_PATH)) {
-            fs.mkdirSync(JOU_FOLDER_PATH, { recursive: true });
+        try {
+            if (!fs.existsSync(JOU_FOLDER_PATH)) {
+                fs.mkdirSync(JOU_FOLDER_PATH, { recursive: true });
+            }
+            fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify({ token }));
+            console.log("✅ Config written to ", CONFIG_FILE_PATH);
+        } catch (err) {
+            console.error("❌ Error writing config:  ", err);
         }
-        fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify({ token }));
 
         res.json({ message: "User Logged In" })
     }
