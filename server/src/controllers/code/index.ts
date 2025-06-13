@@ -35,7 +35,7 @@ export const pushCode = async (req: Request, res: Response) => {
                 const driveRes = await drive.files.create({
                     requestBody: {
                         name: fileMetadata.filename,
-                        parents: [process.env.DRIVE_THUMBNAIL_FOLDER_ID!],
+                        parents: [process.env.DRIVE_CLI_FOLDERID!],
                         mimeType: 'application/zip',
                     },
                     media: {
