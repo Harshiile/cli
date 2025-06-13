@@ -7,6 +7,8 @@
   "dependencies": {
     "archiver": "^7.0.1",
     "axios": "^1.9.0",
+    "chalk": "^5.4.1",
+    "cli-table3": "^0.6.5",
     "commander": "^14.0.0",
     "form-data": "^4.0.3",
     "fs-extra": "^11.3.0",
@@ -14,25 +16,21 @@
     "unzipper": "^0.12.3"
   },
   "scripts": {
-    "build": "pkg . --out-path bin"
+    "build": "npx pkg . --out-path bin"
   },
   "author": "harshiile",
   "license": "ISC",
   "bin": {
-    "cli": "./src/index.js"
+    "jou": "./src/index.js"
   },
   "pkg": {
     "scripts": [],
-    "outputPath": "dist/binaries",
     "assets": [
       "node_modules/**/*"
     ],
     "targets": [
       "node18-linux-x64",
-      "node18-linux-arm64",
-      "node18-macos-x64",
-      "node18-macos-arm64",
-      "node18-win-x64"
+      "node18-linux-arm64"
     ]
   }
 }

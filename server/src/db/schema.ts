@@ -12,6 +12,7 @@ export const workspaceTable = pgTable("cli-workspaces", {
     name: varchar('name').notNull(),
     owner: varchar('owner').notNull().references(() => userTable.username),
     zip_id: varchar('zip_id').notNull(),
+    message: varchar("message"),
     visibility_public: boolean("visibility_public")
 }, (table) => ({
     uniqueUserVideo: unique().on(table.name, table.owner),

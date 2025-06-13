@@ -3,6 +3,7 @@ import { db } from '../../db';
 import { workspaceTable } from '../../db/schema';
 import { and, eq } from 'drizzle-orm';
 import { CLIError } from '../utils/error';
+import { drive } from '../utils/screats';
 
 export const getWorkspaces = async (req: Request, res: Response) => {
     const { option } = req.query;
@@ -21,7 +22,8 @@ export const getWorkspaces = async (req: Request, res: Response) => {
     const workspaces = await db
         .select({
             name: workspaceTable.name,
-            visibility: workspaceTable.visibility_public
+            visibility: workspaceTable.visibility_public,
+            message: workspaceTable.message
         })
         .from(workspaceTable)
         .where(whereClause)
@@ -35,7 +37,7 @@ export const deleteWorkspace = async (req: Request, res: Response) => {
     const username = req.username;
     if (!name) throw new Error("Invalid Params");
 
-    const deletedWorkspace = await db
+    const [deletedWorkspace] = await db
         .delete(workspaceTable)
         .where(
             and(
@@ -43,11 +45,17 @@ export const deleteWorkspace = async (req: Request, res: Response) => {
                 eq(workspaceTable.owner, username as string)
             )
         )
+        .returning()
         .catch(_ => { throw new CLIError(500, "Failed, Try Again") });
 
-    if (deletedWorkspace.rowCount == 0) throw new CLIError(404, "Workspace Not Found");
+    if (!deletedWorkspace) throw new CLIError(404, "Workspace Not Found");
 
-    res.json({ message: `${username}/${name} Deleted` })
+    // File Delete On Drive
+    await drive.files.delete({
+        fileId: deletedWorkspace.zip_id
+    }).catch(_ => { })
+
+    res.json({ message: `@${username}/${name} Deleted` })
 }
 
 export const getVisibility = async (req: Request, res: Response) => {
@@ -58,7 +66,7 @@ export const getVisibility = async (req: Request, res: Response) => {
     const workspace = await getWorkspaceVisibility(name as string, username!);
     if (!workspace) throw new CLIError(404, "Workspace Not Found");
 
-    res.json({ message: `${!workspace.visibility ? 'private' : 'public'}` })
+    res.json({ message: `${!workspace.visibility ? 'Private' : 'Public'}` })
 }
 
 export const changeVisibility = async (req: Request, res: Response) => {
@@ -84,7 +92,7 @@ export const changeVisibility = async (req: Request, res: Response) => {
         )
         .catch(_ => { throw new CLIError(500, "Failed, Try Again") });
 
-    res.json({ message: `Visibility of ${name} changed to -> ${workspace.visibility ? 'private' : 'public'}` })
+    res.json({ message: `Visibility of ${name} changed to -> ${workspace.visibility ? 'Private' : 'Public'}` })
 }
 
 const getWorkspaceVisibility = async (name: string, username: string) => {

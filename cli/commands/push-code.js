@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 const FormData = require('form-data');
@@ -13,7 +13,8 @@ const pushCode = (program) => {
         .description('Push a local folder (zipped automatically) to cloud storage')
         .argument('name')
         .argument('folder_path')
-        .action(async (name, folder_path) => {
+        .option("-m, --message <message>")
+        .action(async (name, folder_path, msg) => {
 
             const token = getToken();
             if (!token) console.log("Token not found, Please Login Again");
@@ -26,16 +27,18 @@ const pushCode = (program) => {
 
             fs.mkdirSync('./.cli', { recursive: true });
 
-            const absPath = path.resolve(`./.cli/cli-${username}-${name}.zip`);
+            const absPath = path.resolve(`./.cli/${username}-${name}.zip`);
+            console.log('Fetching Files...');
 
             // zip the folder
             await zipFolder(folder_path, absPath).catch(err => console.log(err.message));
 
+            console.log('Files Pushing');
             // uploading
             const form = new FormData();
             form.append('zipFile', fs.createReadStream(absPath));
             form.append('name', name);
-            form.append('folderName', path.basename(folder_path));
+            form.append('message', msg.message);
 
             const headers = {
                 ...form.getHeaders(),
@@ -46,8 +49,10 @@ const pushCode = (program) => {
             })
                 .then(({ data }) => console.log(data.message))
                 .catch(err => console.log(err.message))
-
+            // Deleting .cli folder
+            await fs.remove(path.join('./.cli'))
         });
+
 }
 module.exports = { pushCode }
 

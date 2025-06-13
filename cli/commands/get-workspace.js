@@ -1,4 +1,18 @@
 const { Fetcher } = require('../utils/fetcher');
+const Table = require('cli-table3');
+const chalk = require('chalk');
+
+
+// Column headers
+const headers = ['NAME', 'VISIBILITY', 'MESSAGE'];
+
+// Set column widths
+const colWidths = [20, 15, 40];
+
+// Format a row
+const formatRow = (cols) =>
+    cols.map((col, i) => col.padEnd(colWidths[i])).join('');
+
 
 const getWorkspaceCommand = (program) => {
     program
@@ -18,10 +32,14 @@ const getWorkspaceCommand = (program) => {
             await Fetcher({
                 url,
                 cb: (workspaces) => {
-                    workspaces?.forEach((ws) => {
-                        if (option.public || option.private) console.log(ws.name)
-                        else
-                            console.log(`${ws.name} - ${ws.visibility ? 'public' : 'private'}`)
+                    console.log(formatRow(headers));
+                    workspaces.forEach(ws => {
+                        const row = [
+                            ws.name,
+                            ws.visibility ? 'Public' : 'Private',
+                            ws.message,
+                        ];
+                        console.log(formatRow(row));
                     })
                 },
                 needToken: true

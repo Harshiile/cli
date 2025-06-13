@@ -9,7 +9,8 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/controllers/utils/screats.ts"
   ],
   "exclude": [
     "node_modules"

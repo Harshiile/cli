@@ -35,7 +35,7 @@ const getCode = (program) => {
 
                 // download zip file
                 try {
-
+                    console.log('Downloading Start');
                     const res = await fetch(`http://localhost:3000/get-code?workspace=${name}`, {
                         headers: {
                             'authorization': token
@@ -43,8 +43,8 @@ const getCode = (program) => {
                     });
 
                     if (!res.ok) {
-                        const error = await res.text()
-                        console.log(error);
+                        const error = await res.json()
+                        console.log(error.message);
                         return;
                     }
 
@@ -61,7 +61,6 @@ const getCode = (program) => {
                     const downloadedZipFile = path.join(workspacePath, 'tmp.zip')
 
                     const fileStream = fs.createWriteStream(downloadedZipFile)
-                    console.log('Downloading Start');
 
                     // Receiving file in .cli-code/workspace/
                     await new Promise((resolve, reject) => {

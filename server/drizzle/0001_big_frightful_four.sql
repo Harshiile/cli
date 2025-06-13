@@ -1,0 +1,1 @@
+ALTER TABLE "cli-workspaces" ADD COLUMN "message" varchar;
