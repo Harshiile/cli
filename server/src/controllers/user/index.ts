@@ -35,23 +35,8 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
     if (!user) throw new CLIError(404, `User not exists, You can sign up at ${chalk.blue('http://localhost:3000/signup')}`);
 
     if (await comparePass(user.password, password)) {
-        // Make .config 
-        const JOU_FOLDER_PATH = path.join(os.homedir(), '.jou');
-        const CONFIG_FILE_PATH = path.join(JOU_FOLDER_PATH, 'config.json');
-        const token = jwtGenerate({ username })
-
-
-        try {
-            if (!fs.existsSync(JOU_FOLDER_PATH)) {
-                fs.mkdirSync(JOU_FOLDER_PATH, { recursive: true });
-            }
-            fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify({ token }));
-            console.log("✅ Config written to ", CONFIG_FILE_PATH);
-        } catch (err) {
-            console.error("❌ Error writing config:  ", err);
-        }
-
-        res.json({ message: "User Logged In" })
+        const token = jwtGenerate({ username });
+        res.json({ message: "User Logged In", token: JSON.stringify({ token }) })
     }
     else throw new CLIError(400, "Incorrect Password");
 }
