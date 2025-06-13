@@ -36,13 +36,15 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
 
     if (await comparePass(user.password, password)) {
         // Make .config 
-        const CONFIG_PATH = path.join(os.homedir(), '.jou', 'config.json');
+        const JOU_FOLDER_PATH = path.join(os.homedir(), '.jou');
+        const CONFIG_FILE_PATH = path.join(JOU_FOLDER_PATH, 'config.json');
         const token = jwtGenerate({ username })
 
-        if (!fs.existsSync(CONFIG_PATH)) {
-            fs.mkdirSync(CONFIG_PATH, { recursive: true });
+
+        if (!fs.existsSync(JOU_FOLDER_PATH)) {
+            fs.mkdirSync(JOU_FOLDER_PATH, { recursive: true });
         }
-        fs.writeFileSync(CONFIG_PATH, JSON.stringify({ token }));
+        fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify({ token }));
 
         res.json({ message: "User Logged In" })
     }
