@@ -3,6 +3,7 @@ const { Fetcher } = require('../utils/fetcher');
 const loginCommand = (program) => {
     program
         .command('login')
+        .description('Authenticate yourself to start pushing and managing workspaces')
         .arguments('<username>')
         .arguments('<password>')
         .action(async (username, password) => {

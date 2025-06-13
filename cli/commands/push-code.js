@@ -10,6 +10,7 @@ const { Fetcher } = require('../utils/fetcher');
 const pushCode = (program) => {
     program
         .command('push')
+        .description('Push a local folder (zipped automatically) to cloud storage')
         .argument('name')
         .argument('folder_path')
         .action(async (name, folder_path) => {

@@ -7,14 +7,23 @@ const { changeVisibiliyOfWorkspaceCommand } = require('../commands/change-visibi
 const { deleteWorkspaceommand } = require('../commands/delete-workspace');
 const { pushCode } = require('../commands/push-code');
 const { getCode } = require('../commands/get-code');
-const { testCommand } = require('../commands/test');
 const { loginCommand } = require('../commands/login');
 
 
 const program = new Command();
 
 program
-    .name('cli');
+    .name('cli')
+    .version('1.0.0')
+    .description(`
+        🛠️ JOU CLI: Save, Push, and Retrieve Your Code Workspaces Effortlessly!
+
+        Commands allow developers to:
+        - 🔐 Securely login
+        - 💾 Push code folders as zip to cloud
+        - 🧠 Retrieve previously saved workspaces
+        - 🧮 Manage visibility and workspace metadata
+        `);
 
 loginCommand(program)
 getWorkspaceCommand(program)
@@ -23,6 +32,5 @@ changeVisibiliyOfWorkspaceCommand(program)
 deleteWorkspaceommand(program)
 pushCode(program)
 getCode(program)
-testCommand(program)
 
 program.parse(process.argv);

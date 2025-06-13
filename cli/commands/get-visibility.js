@@ -3,6 +3,7 @@ const { Fetcher } = require('../utils/fetcher');
 const getVisibiliyOfWorkspaceCommand = (program) => {
     program
         .command('visibility')
+        .description('Check visibility of the given workspace')
         .argument('workspace')
         .action(async (argument) => {
             await Fetcher({

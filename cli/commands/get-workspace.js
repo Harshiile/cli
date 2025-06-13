@@ -2,12 +2,12 @@ const { Fetcher } = require('../utils/fetcher');
 
 const getWorkspaceCommand = (program) => {
     program
-        .command('workspaces ls')
-        .option('--public')
-        .option('--private')
+        .command('workspaces')
+        .description('Retrieve and unzip a previously pushed workspace')
+        .option('--public', 'List public workspaces')
+        .option('--private', 'List private workspaces')
+        .description('List all your saved workspaces (filter with --public / --private)')
         .action(async (option) => {
-
-
             const url =
                 option.public && `/get-workspaces?option=public`
                 ||

@@ -9,6 +9,7 @@ const { Fetcher } = require('../utils/fetcher');
 const getCode = (program) => {
     program
         .command('get')
+        .description('Retrieve and unzip a previously pushed workspace')
         .argument('name')
         .action(async (name) => {
 

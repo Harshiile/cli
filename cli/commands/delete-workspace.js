@@ -4,6 +4,7 @@ const deleteWorkspaceommand = (program) => {
     program
         .command('delete')
         .argument('workspace')
+        .description('Delete a workspace permanently')
         .action(async (argument) => {
             await Fetcher({
                 url: `/delete-workspace?name=${argument}`,
