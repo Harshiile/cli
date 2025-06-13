@@ -39,8 +39,8 @@ export const loginUser = async (req: Request<{}, {}, User>, res: Response) => {
         const CONFIG_PATH = path.join(os.homedir(), '.jou', 'config.json');
         const token = jwtGenerate({ username })
 
-        if (!fs.existsSync(path.dirname(CONFIG_PATH))) {
-            fs.mkdirSync(path.dirname(CONFIG_PATH), { recursive: true });
+        if (!fs.existsSync(CONFIG_PATH)) {
+            fs.mkdirSync(CONFIG_PATH, { recursive: true });
         }
         fs.writeFileSync(CONFIG_PATH, JSON.stringify({ token }));
 
