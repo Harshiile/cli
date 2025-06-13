@@ -1,7 +1,4 @@
 const { Fetcher } = require('../utils/fetcher');
-const Table = require('cli-table3');
-const chalk = require('chalk');
-
 
 // Column headers
 const headers = ['NAME', 'VISIBILITY', 'MESSAGE'];

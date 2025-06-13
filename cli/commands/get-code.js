@@ -10,82 +10,76 @@ const getCode = (program) => {
     program
         .command('get')
         .description('Retrieve and unzip a previously pushed workspace')
-        .argument('name')
-        .action(async (name) => {
+        .argument('workspace')
+        .action(async (workspace) => {
 
             // Getting Token
             const token = getToken();
             if (!token) console.log("Token not found, Please Login Again");
 
-            let username;
-            await Fetcher({
-                url: '/get-username',
-                cb: (data) => username = data.username,
-                needToken: true
-            })
-            if (username) {
-                const saveRoot = path.resolve('.cli-code'); // .cli-code folder
-                const userPath = path.join(saveRoot, username); // .cli-code/user folder
-                const workspacePath = path.join(userPath, name); // .cli-code/user/workspane folder
+            // download zip file
+            try {
+                const res = await fetch(`http://localhost:3000/get-code?workspace=${workspace}`, {
+                    headers: {
+                        'authorization': token
+                    }
+                });
 
-                // Create .cli-code if not exists
-                if (!fs.existsSync(path.resolve(saveRoot))) {
-                    fs.mkdirSync(path.join(saveRoot), { recursive: true })
+
+                if (!res.ok) {
+                    const error = await res.json()
+                    console.log(error.message);
+                    return;
                 }
+                console.log(await res.json());
 
-                // download zip file
-                try {
-                    console.log('Downloading Start');
-                    const res = await fetch(`http://localhost:3000/get-code?workspace=${name}`, {
-                        headers: {
-                            'authorization': token
-                        }
-                    });
+                console.log('Downloading Start');
 
-                    if (!res.ok) {
-                        const error = await res.json()
-                        console.log(error.message);
-                        return;
-                    }
+                // const saveRoot = path.resolve('.cli-code'); // .cli-code folder
+                // const userPath = path.join(saveRoot, username); // .cli-code/user folder
+                // const workspacePath = path.join(userPath, name); // .cli-code/user/workspane folder
 
-                    // Create .cli-code/user folder
-                    if (!fs.existsSync(path.resolve(userPath))) {
-                        fs.mkdirSync(path.join(userPath), { recursive: true })
-                    }
+                // // Create .cli-code if not exists
+                // if (!fs.existsSync(path.resolve(saveRoot))) {
+                //     fs.mkdirSync(path.join(saveRoot), { recursive: true })
+                // }
 
-                    // Create .cli-code/user/workspace folder
-                    if (!fs.existsSync(path.resolve(workspacePath))) {
-                        fs.mkdirSync(path.join(workspacePath), { recursive: true })
-                    }
+                // // Create .cli-code/user folder
+                // if (!fs.existsSync(path.resolve(userPath))) {
+                //     fs.mkdirSync(path.join(userPath), { recursive: true })
+                // }
 
-                    const downloadedZipFile = path.join(workspacePath, 'tmp.zip')
+                // // Create .cli-code/user/workspace folder
+                // if (!fs.existsSync(path.resolve(workspacePath))) {
+                //     fs.mkdirSync(path.join(workspacePath), { recursive: true })
+                // }
 
-                    const fileStream = fs.createWriteStream(downloadedZipFile)
+                // const downloadedZipFile = path.join(workspacePath, 'tmp.zip')
 
-                    // Receiving file in .cli-code/workspace/
-                    await new Promise((resolve, reject) => {
-                        res.body?.pipe(fileStream);
-                        res.body?.on('error', reject)
-                        fileStream.on('finish', () => resolve(1))
-                    })
-                    console.log('Unzipping Start');
+                // const fileStream = fs.createWriteStream(downloadedZipFile)
 
-                    // Extract Zip File
-                    await fs.createReadStream(downloadedZipFile)
-                        .pipe(unzipper.Extract({ path: path.resolve(workspacePath) }))
-                        .promise();
+                // // Receiving file in .cli-code/workspace/
+                // await new Promise((resolve, reject) => {
+                //     res.body?.pipe(fileStream);
+                //     res.body?.on('error', reject)
+                //     fileStream.on('finish', () => resolve(1))
+                // })
+                // console.log('Unzipping Start');
 
-                    // Removing tmp.zip file
-                    await fs.remove(downloadedZipFile);
+                // // Extract Zip File
+                // await fs.createReadStream(downloadedZipFile)
+                //     .pipe(unzipper.Extract({ path: path.resolve(workspacePath) }))
+                //     .promise();
 
-                    console.log(`Code arrived at : '.cli-code/${username}/${name}'`)
-                } catch (err) {
-                    if (err instanceof Error) {
-                        console.log(err.message);
-                    }
+                // // Removing tmp.zip file
+                // await fs.remove(downloadedZipFile);
+
+                // console.log(`Code arrived at : '.cli-code/${username}/${name}'`)
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.log(err.message);
                 }
             }
-            else console.log('Username not found')
         });
 }
 module.exports = { getCode }

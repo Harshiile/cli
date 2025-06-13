@@ -27,7 +27,7 @@ const Fetcher = async ({
         }
     };
 
-    return await fetch(`http://localhost:3000${url}`, fetchOptions)
+    return await fetch(`https://jou-cli.vercel.app${url}`, fetchOptions)
         .then(res => res.json())
         .then(cb)
         .catch((err) => {
