@@ -1,3 +1,0 @@
-###
-GET http://localhost:3000/zip-folder?folder_path=./drizzle
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImhhcnNoaWlsZSIsImlhdCI6MTc0OTY5ODk0N30.HgANTS7mp4k6dIC-UYGUfiugJrIAfCZD2fvo5-wbHwM

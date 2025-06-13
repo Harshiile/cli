@@ -54,10 +54,10 @@ export const pushCode = async (req: Request, res: Response) => {
                 );
 
                 const dbData = {
-                    name: fields.name,
+                    name: fields?.name,
                     owner: username as string,
                     zip_id: driveRes.data.id as string,
-                    message: fields.message,
+                    message: fields?.message || '',
                     visibility_public: false
                 }
 
@@ -106,20 +106,36 @@ export const pushCode = async (req: Request, res: Response) => {
 
 
 export const getCode = async (req: Request, res: Response) => {
-    const { workspace } = req.query
+    const query = req.query
     const username = req.username
+
+    const workspace = query.workspace as string
+
+    if (!workspace) throw new CLIError(404, "Workspace Not Found");
+
+    const wsWithName = workspace.split('/');
+    if (wsWithName.length != 2) throw new CLIError(400, "Invalid Workspace");
+
+    const wsUsername = wsWithName[0];
+    const wsName = wsWithName[1];
 
     const [ws] = await db
         .select({
-            zipFileId: workspaceTable.zip_id
+            zipFileId: workspaceTable.zip_id,
+            visibilityPublic: workspaceTable.visibility_public,
+            usernameOfWorkspace: workspaceTable.owner
         })
         .from(workspaceTable)
-        .where(and(
-            eq(workspaceTable.name, workspace as string),
-            eq(workspaceTable.owner, username as string)
-        ));
+        .where(eq(workspaceTable.name, wsName));
 
     if (!ws) throw new CLIError(404, "Workspace Not Found");
+
+    console.log({
+        dbUsername: ws.usernameOfWorkspace,
+        username
+    });
+
+    if (!ws.visibilityPublic && ws.usernameOfWorkspace != wsUsername) throw new CLIError(404, "Workspace Not Found");
 
     try {
         const driveStream = await drive.files.get(
