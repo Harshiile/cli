@@ -66,3 +66,10 @@ export const addUser = async (req: Request<{}, {}, User>, res: Response) => {
 
     res.json({ message: "User Created" })
 }
+
+
+export const testAPI = async (req: Request, res: Response) => {
+    res.json({
+        message: "Testing Done"
+    })
+}
