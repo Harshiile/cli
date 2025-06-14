@@ -1,19 +1,45 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import './index.css';
-import { Signup } from './pages/Signup';
-import { Dashboard } from './pages/Dashboard';
-import { Docs } from './pages/Docs';
-import { Navbar } from './pages/Navbar';
-import { Binary } from './pages/Binary';
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import HomePage from './pages/Home'
+import Layout from './layout'
+import DocsPage from './pages/Docs'
+import LoginPage from './pages/Login'
+import SignupPage from './pages/Signup'
+import DownloadPage from './pages/Download'
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navbar />} />
-      </Routes>
-    </Router>
-  );
-}
+createRoot(document.getElementById('root')).render(
+  <Router>
+    <Routes>
+      <Route path='/' element={
+        <Layout>
+          <HomePage />
+        </Layout>
+      } />
 
-export default App;
+      <Route path='/docs' element={
+        <Layout>
+          <DocsPage />
+        </Layout>
+      } />
+
+      <Route path='/login' element={
+        <Layout>
+          <LoginPage />
+        </Layout>
+      } />
+
+      <Route path='/signup' element={
+        <Layout>
+          <SignupPage />
+        </Layout>
+      } />
+
+      <Route path='/download' element={
+        <Layout>
+          <DownloadPage />
+        </Layout>
+      } />
+    </Routes >
+  </Router >
+)
