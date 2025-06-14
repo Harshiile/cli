@@ -11,6 +11,7 @@ export function Header() {
         { href: "/", label: "Home" },
         { href: "/docs", label: "Docs" },
         { href: "/download", label: "Download" },
+        { href: "/dashboard", label: "Dashboard" },
     ]
 
     return (
