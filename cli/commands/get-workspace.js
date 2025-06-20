@@ -1,4 +1,5 @@
 const { Fetcher } = require('../utils/fetcher');
+const { createSpinner } = require('nanospinner')
 
 // Column headers
 const headers = ['NAME', 'VISIBILITY', 'MESSAGE'];
@@ -26,11 +27,14 @@ const getWorkspaceCommand = (program) => {
                 ||
                 '/get-workspaces'
 
+            const spinner = createSpinner("Fetching workspaces...").start();
+
             await Fetcher({
                 url,
-                cb: (workspaces) => {
+                cb: ({ data }) => {
+                    spinner.success({ text: "Workspaces\n" });
                     console.log(formatRow(headers));
-                    workspaces.forEach(ws => {
+                    data.forEach(ws => {
                         const row = [
                             ws.name,
                             ws.visibility ? 'Public' : 'Private',
@@ -41,6 +45,9 @@ const getWorkspaceCommand = (program) => {
                 },
                 needToken: true
             })
+                .catch(err => {
+                    spinner.error({ text: err.message || 'Failed to fetch workspaces' });
+                });
         });
 }
 module.exports = { getWorkspaceCommand }

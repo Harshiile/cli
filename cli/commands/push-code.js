@@ -5,7 +5,7 @@ const FormData = require('form-data');
 const axios = require('axios');
 const { getToken } = require('../utils/token');
 const { Fetcher } = require('../utils/fetcher');
-
+const { createSpinner } = require('nanospinner');
 
 const pushCode = (program) => {
     program
@@ -15,58 +15,75 @@ const pushCode = (program) => {
         .argument('folder_path')
         .option("-m, --message <message>")
         .action(async (name, folder_path, msg) => {
-
             const token = getToken();
-            if (!token) console.log("Token not found, Please Login Again");
+            if (!token) {
+                console.log("Token not found, Please Login Again");
+                return;
+            }
+
             let username;
+            const zipSpinner = createSpinner('Zipping folder...').start();
+
             await Fetcher({
                 url: '/get-username',
-                cb: (data) => username = data.username,
+                methodType: 'POST',
+                cb: ({ data }) => username = data.username,
                 needToken: true
-            })
+            }).catch(err => userSpinner.error({ text: err.message }));
 
-            fs.mkdirSync('./.cli', { recursive: true });
+            fs.mkdirSync('./.jou', { recursive: true });
 
-            const absPath = path.resolve(`./.cli/${username}-${name}.zip`);
-            console.log('Fetching Files...');
+            const absPath = path.resolve(`./.jou/${username}-${name}.zip`);
 
-            // zip the folder
-            await zipFolder(folder_path, absPath).catch(err => console.log(err.message));
+            await zipFolder(folder_path, absPath)
+                .then(() => zipSpinner.success({ text: 'Zipped successfully' }))
+                .catch(err => {
+                    zipSpinner.error({ text: err.message });
+                    return;
+                });
 
-            console.log('Files Pushing');
-            // uploading
+            const uploadSpinner = createSpinner('Uploading files...').start();
+
             const form = new FormData();
             form.append('zipFile', fs.createReadStream(absPath));
             form.append('name', name);
             form.append('message', msg.message);
 
-            const headers = {
-                ...form.getHeaders(),
-                Authorization: token
-            }
-            axios.post('http://localhost:3000/push-code', form, {
-                headers
+
+            // Push to IPFS from here
+            // Save data on blockchain
+
+            await axios.post('https://jou-cli.onrender.com/push-code', form, {
+                headers: {
+                    ...form.getHeaders(),
+                    'authorization': token
+                }
             })
-                .then(({ data }) => console.log(data.message))
-                .catch(err => console.log(err.message))
-            // Deleting .cli folder
-            await fs.remove(path.join('./.cli'))
+                .then(({ data }) => uploadSpinner.success({ text: data.message }))
+                .catch(({ response }) => {
+                    uploadSpinner.error({ text: response.data.message });
+                    return;
+                });
+
+            const cleanupSpinner = createSpinner('Cleaning up temporary files...').start();
+            await fs.remove(path.join('./.jou'))
+                .then(() => cleanupSpinner.success({ text: 'Cleanup done' }))
+                .catch(err => cleanupSpinner.error({ text: err.message }));
         });
+};
 
-}
-module.exports = { pushCode }
-
+module.exports = { pushCode };
 
 const zipFolder = (folderPath, zipPath) => {
     return new Promise((resolve, reject) => {
         const writeStream = fs.createWriteStream(zipPath);
         const archive = archiver('zip', { zlib: { level: 9 } });
 
-        writeStream.on('close', () => resolve({}))
-        archive.on('error', err => reject({ err }))
+        writeStream.on('close', () => resolve({}));
+        archive.on('error', err => reject({ err }));
 
-        archive.pipe(writeStream)
-        archive.directory(folderPath, false)
-        archive.finalize()
-    })
-}
+        archive.pipe(writeStream);
+        archive.directory(folderPath, false);
+        archive.finalize();
+    });
+};
