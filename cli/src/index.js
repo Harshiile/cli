@@ -8,6 +8,9 @@ const { deleteWorkspaceommand } = require('../commands/delete-workspace');
 const { pushCode } = require('../commands/push-code');
 const { getCode } = require('../commands/get-code');
 const { loginCommand } = require('../commands/login');
+const { changeDefaultVisibility } = require('../commands/change-default-visibility');
+const { configCommand } = require('../commands/config');
+const { checkWeb3Command } = require('../commands/checkWeb3');
 
 
 const program = new Command();
@@ -32,5 +35,8 @@ changeVisibiliyOfWorkspaceCommand(program)
 deleteWorkspaceommand(program)
 pushCode(program)
 getCode(program)
+changeDefaultVisibility(program)
+configCommand(program)
+checkWeb3Command(program)
 
 program.parse(process.argv);

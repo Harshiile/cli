@@ -1,10 +1,10 @@
 const fs = require('fs-extra');
 const path = require('path');
-const fetch = require('node-fetch');
 const { getToken } = require('../utils/token');
 const unzipper = require('unzipper');
-const { Fetcher } = require('../utils/fetcher');
-
+const { createSpinner } = require('nanospinner');
+const axios = require('axios');
+const { pipeline } = require('stream/promises')
 
 const getCode = (program) => {
     program
@@ -13,73 +13,76 @@ const getCode = (program) => {
         .argument('workspace')
         .action(async (workspace) => {
 
-            // Getting Token
-            const token = getToken();
-            if (!token) console.log("Token not found, Please Login Again");
 
-            // download zip file
+            // User can give output folder path, if exist, copy there & if not make it & copied files there
+
+
+            const token = getToken();
+            if (!token) {
+                console.log("Token not found, Please Login Again");
+                return;
+            }
+
+            let spinner;
             try {
-                const res = await fetch(`http://localhost:3000/get-code?workspace=${workspace}`, {
-                    headers: {
-                        'authorization': token
-                    }
+
+                const wsWithName = workspace.split('/');
+                if (wsWithName.length != 2) { throw new Error("Invalid Workspace") }
+
+                spinner = createSpinner(`Fetching "${workspace}"...`).start();
+
+                const username = wsWithName[0];
+                const name = wsWithName[1];
+
+
+                const res = await axios.get(`https://jou-cli.onrender.com/get-code?workspace=${workspace}`, {
+                    responseType: 'stream',
+                    headers: { 'authorization': token }
+                })
+                    .catch(({ response }) => {
+                        throw new Error(response.data.message)
+                    })
+
+                spinner.success({ text: 'Fetched metadata successfully' });
+
+                const saveRoot = path.resolve('.jou-code');
+                const userPath = path.join(saveRoot, username);
+                const workspacePath = path.join(userPath, name);
+
+                [saveRoot, userPath, workspacePath].forEach(dir => {
+                    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
                 });
 
+                const downloadedZipFile = path.join(workspacePath, 'tmp.zip');
+                const fileStream = fs.createWriteStream(downloadedZipFile);
 
-                if (!res.ok) {
-                    const error = await res.json()
-                    console.log(error.message);
-                    return;
-                }
-                console.log(await res.json());
+                const downloadSpinner = createSpinner('Downloading zip...').start();
 
-                console.log('Downloading Start');
+                await new Promise((resolve, reject) => {
+                    res.data.pipe(fileStream);
+                    res.data.on('error', reject);
+                    fileStream.on('finish', resolve);
+                });
 
-                // const saveRoot = path.resolve('.cli-code'); // .cli-code folder
-                // const userPath = path.join(saveRoot, username); // .cli-code/user folder
-                // const workspacePath = path.join(userPath, name); // .cli-code/user/workspane folder
+                downloadSpinner.success({ text: 'Download complete' });
 
-                // // Create .cli-code if not exists
-                // if (!fs.existsSync(path.resolve(saveRoot))) {
-                //     fs.mkdirSync(path.join(saveRoot), { recursive: true })
-                // }
+                const unzipSpinner = createSpinner('Unzipping file...').start();
 
-                // // Create .cli-code/user folder
-                // if (!fs.existsSync(path.resolve(userPath))) {
-                //     fs.mkdirSync(path.join(userPath), { recursive: true })
-                // }
+                await fs.createReadStream(downloadedZipFile)
+                    .pipe(unzipper.Extract({ path: path.resolve(workspacePath) }))
+                    .promise();
 
-                // // Create .cli-code/user/workspace folder
-                // if (!fs.existsSync(path.resolve(workspacePath))) {
-                //     fs.mkdirSync(path.join(workspacePath), { recursive: true })
-                // }
+                unzipSpinner.success({ text: 'Unzipped successfully' });
+                const codeArrived = createSpinner('Code arriving ...').start();
 
-                // const downloadedZipFile = path.join(workspacePath, 'tmp.zip')
+                await fs.remove(downloadedZipFile);
 
-                // const fileStream = fs.createWriteStream(downloadedZipFile)
+                codeArrived.success({ text: `Code arrived at : .jou-code/${username}/${name}` });
 
-                // // Receiving file in .cli-code/workspace/
-                // await new Promise((resolve, reject) => {
-                //     res.body?.pipe(fileStream);
-                //     res.body?.on('error', reject)
-                //     fileStream.on('finish', () => resolve(1))
-                // })
-                // console.log('Unzipping Start');
-
-                // // Extract Zip File
-                // await fs.createReadStream(downloadedZipFile)
-                //     .pipe(unzipper.Extract({ path: path.resolve(workspacePath) }))
-                //     .promise();
-
-                // // Removing tmp.zip file
-                // await fs.remove(downloadedZipFile);
-
-                // console.log(`Code arrived at : '.cli-code/${username}/${name}'`)
             } catch (err) {
-                if (err instanceof Error) {
-                    console.log(err.message);
-                }
+                spinner?.error({ text: err.message || 'Unknown error' });
             }
         });
-}
-module.exports = { getCode }
+};
+
+module.exports = { getCode };

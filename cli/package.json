@@ -5,11 +5,15 @@
   "main": "./src/index.js",
   "type": "commonjs",
   "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@solana/web3.js": "^1.98.2",
     "archiver": "^7.0.1",
     "axios": "^1.9.0",
     "commander": "^14.0.0",
     "form-data": "^4.0.3",
     "fs-extra": "^11.3.0",
+    "inquirer": "^12.6.3",
+    "nanospinner": "^1.2.2",
     "node-fetch": "^2.7.0",
     "unzipper": "^0.12.3"
   },
@@ -19,7 +23,7 @@
   "author": "harshiile",
   "license": "ISC",
   "bin": {
-    "jou": "./src/index.js"
+    "cli": "./src/index.js"
   },
   "pkg": {
     "scripts": [],
@@ -27,7 +31,12 @@
       "node_modules/**/*"
     ],
     "targets": [
-      "node18-linux-x64"
+      "node18-linux-x64",
+      "node18-linux-arm64",
+      "node18-macos-x64",
+      "node18-macos-arm64",
+      "node18-win-x64",
+      "node18-win-arm64"
     ]
   }
 }

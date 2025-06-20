@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const { getToken } = require('./token');
 
 const Fetcher = async ({
@@ -13,25 +14,16 @@ const Fetcher = async ({
         if (!token) console.log("Token not found, Please Login Again");
     }
 
-    const fetchOptions = methodType != 'GET' ? {
+    const axiosOptions = methodType != 'GET' ? {
         method: methodType,
-        body: JSON.stringify(body),
-        headers: {
-            'Content-Type': 'application/json',
-            'authorization': token || ''
-        }
-    } : {
-        headers: {
-            'Content-Type': 'application/json',
-            'authorization': token || ''
-        }
-    };
+        data: body
+    } : {}
 
-    return await fetch(`https://jou-cli.vercel.app${url}`, fetchOptions)
-        .then(res => res.json())
-        .then(cb)
-        .catch((err) => {
-            console.log(err)
-        })
-}
+    axiosOptions.headers = needToken ? {
+        'authorization': token
+    } : {}
+
+    return axios(`https://jou-cli.onrender.com${url}`, axiosOptions).then(cb).catch(({ response }) => { throw new Error(response.data.message) })
+};
+
 module.exports = { Fetcher }

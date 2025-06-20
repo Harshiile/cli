@@ -1,4 +1,5 @@
 const { Fetcher } = require('../utils/fetcher');
+const { createSpinner } = require('nanospinner');
 
 const changeVisibiliyOfWorkspaceCommand = (program) => {
     program
@@ -6,12 +7,19 @@ const changeVisibiliyOfWorkspaceCommand = (program) => {
         .argument('workspace')
         .description('Toggle the visibility (public/private) of a workspace')
         .action(async (argument) => {
+            const spinner = createSpinner(`Toggling visibility of "${argument}"...`).start();
+
             await Fetcher({
                 url: `/change-visibility?name=${argument}`,
                 methodType: 'PATCH',
-                cb: ({ message }) => console.log(message),
+                cb: ({ data }) => {
+                    spinner.success({ text: data.message });
+                },
                 needToken: true
-            })
+            }).catch(err => {
+                spinner.error({ text: err.message || 'Failed to toggle visibility' });
+            });
         });
-}
-module.exports = { changeVisibiliyOfWorkspaceCommand }
+};
+
+module.exports = { changeVisibiliyOfWorkspaceCommand };
